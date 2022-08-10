@@ -112,3 +112,107 @@ exec spBuscarEscuela @CodEscuela = 'E01'
 exec spActualizarEscuela @CodEscuela = 'E01', @Escuela = 'Psico', @Facultad = 'ciencias humanas'
 exec spEliminarEscuela @CodEscuela = 'E01'
 
+
+
+
+-- Tabla Alumno
+if OBJECT_ID('spListarAlumnos') is not null
+	drop proc spListarAlumnos
+go
+create proc spListarAlumnos
+as
+begin
+	select CodAlumno, Apellidos, Nombres, LugarNac, FechaNac CodEscuela from TAlumno
+end
+go
+
+
+if OBJECT_ID('spAgregarAlumno') is not null
+	drop proc spAgregarAlumno
+go
+create proc spAgregarAlumno
+@CodAlumno char(5),	@Apellidos varchar(50),	@Nombres varchar(50),	@LugarNac varchar(50),	@FechaNac datetime,	@CodEscuela char(3)
+as
+begin
+	-- CodEscuela no puede ser duplicado:
+	if not exists(select CodAlumno from TAlumno where CodAlumno=@CodAlumno)
+		if not exists (select Apellidos from TAlumno where Apellidos=@Apellidos)
+			begin
+				insert into TAlumno values(@CodAlumno,@Apellidos,@Nombres,@LugarNac,@FechaNac,@CodEscuela)
+				select CodError = 0, Mensaje = 'Se Inserto correctamente la nuevo alumno'
+			end
+		else select CodError = 1, Mensaje = 'Error: Alumno Duplicada'
+	else select CodError=1, Mensaje = 'Error: Codigo de Alumno duplicado'
+	-- Escuela no puede ser duplicado
+
+end
+go
+
+
+
+
+
+-- Actividad: Implementar Eliminar, Actualizar y Buscar
+--Presentado para el dia miercoles 10 de agosto a traves de aula virtual
+
+
+
+-- Eliminar Alumno
+if OBJECT_ID('spEliminarAlumno') is not null
+	drop proc spEliminarAlumno
+go
+create proc spEliminarAlumno
+@CodAlumno char(5)
+as
+begin
+	-- CodEscuela no puede ser duplicado:
+	if exists(select CodAlumno from TAlumno where CodAlumno=@CodAlumno)
+	begin
+		delete from TAlumno where CodAlumno=@CodAlumno
+		select CodError=0, Mensaje = 'Alumno Borrado'
+	end
+	else select CodError=1, Mensaje = 'Error: Codigo de Alumno no encontrado'
+
+end
+go
+
+
+
+--Actualizar Alumno
+
+if OBJECT_ID('spActualizarAlumno') is not null
+	drop proc spActualizarAlumno
+go
+create proc spActualizarAlumno
+@CodAlumno char(5),	@Apellidos varchar(50),	@Nombres varchar(50),	@LugarNac varchar(50),	@FechaNac datetime,	@CodEscuela char(3)
+as
+begin
+	-- CodEscuela no puede ser duplicado:
+	if exists(select CodAlumno from TAlumno where CodAlumno=@CodAlumno)
+	begin
+		update TAlumno
+		set Apellidos = @Apellidos, Nombres= @Nombres, LugarNac= @LugarNac, FechaNac=@FechaNac, CodEscuela=@CodEscuela
+		where CodAlumno = @CodAlumno;
+		select CodError=0, Mensaje = 'Datos Actualizados'
+		select CodAlumno, Apellidos, Nombres, LugarNac, FechaNac, CodEscuela from TAlumno where CodAlumno=@CodAlumno
+	end
+	else select CodError=1, Mensaje = 'Error: Codigo de Alumno no encontrado'
+end
+go
+
+
+
+-- Buscar Alumno
+if OBJECT_ID('spBuscarEscuela') is not null
+	drop proc spBuscarEscuela
+go
+create proc spBuscarEscuela
+@CodAlumno char(5)
+as
+begin
+	if exists(select CodAlumno from TAlumno where CodAlumno=@CodAlumno)
+	begin
+		select CodAlumno, Apellidos, Nombres, LugarNac, FechaNac, CodEscuela from TAlumno where CodAlumno=@CodAlumno
+	end
+end
+go
