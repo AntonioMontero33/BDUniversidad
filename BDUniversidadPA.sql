@@ -203,10 +203,10 @@ go
 
 
 -- Buscar Alumno
-if OBJECT_ID('spBuscarEscuela') is not null
-	drop proc spBuscarEscuela
+if OBJECT_ID('spBuscarAlumno') is not null
+	drop proc spBuscarAlumno
 go
-create proc spBuscarEscuela
+create proc spBuscarAlumno
 @CodAlumno char(5)
 as
 begin
@@ -216,3 +216,10 @@ begin
 	end
 end
 go
+
+
+exec spListarAlumnos
+exec spAgregarAlumno @CodAlumno = 'A0001',@Apellidos = 'Montero',	@Nombres ='Jose',	@LugarNac ='Cusco',	@FechaNac = '20120618 10:34:09 AM', @CodEscuela = 'E01'
+exec spBuscarAlumno @CodAlumno = 'A0001'
+exec spActualizarAlumno @CodAlumno = 'A0001',@Apellidos = 'Montero',	@Nombres ='Antonio',	@LugarNac ='Lima',	@FechaNac = '16-01-2002',@CodEscuela = 'E03'
+exec spEliminarAlumno @CodAlumno = 'A0001'
